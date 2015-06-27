@@ -105,11 +105,13 @@ Next, it helps (though it isn't required) if you install Phoenix, you can follow
 
 http://www.phoenixframework.org/v0.13.1/docs/installation
 
-Next, you'll need to build the example Phoenix app included in this addon:
+Next, you'll need to build the example Phoenix app included in this addon (you'll also need MariaDB or Mysql):
 
 ```shell
 cd serve
 mix deps.get
+mix ecto.create
+mix ecto.migrate
 iex -S mix phoenix.serve
 ```
 
