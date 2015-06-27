@@ -1,6 +1,9 @@
-import EmberDDPMixin from './mixins/ember-ddp';
+import Ember from 'ember';
+import PhoenixChanMixin from './mixins/phoenix-chan';
+import ChannelStore from './models/channel-store';
 
-export default EmberDDPMixin;
+export default PhoenixChanMixin;
 export {
-  EmberDDPMixin
+  PhoenixChanMixin,
+  ChannelStore
 };

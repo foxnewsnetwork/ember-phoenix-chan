@@ -2,69 +2,79 @@
 
 RSVP = Ember.RSVP
 
+assertInclusion = (key, keys) ->
+  return if keys.contains(key)?
+  throw new Error "Expected #{key} to be found in #{keys}, but it wasn't"
+
+getModelName = (record) ->
+  record?.type?.modelName ?
+  record?.constructor?.modelName ?
+  record?.type?.typeKey ? 
+  record?.constructor.typeKey
+
 class ChannelStore
-  constructor: (@ddp) ->
-    @subscriptions = {}
-    @callbacks =
+  constructor: (@socket) ->
+    @channels =
       changes: {}
       adds: {}
       removes: {}
 
-  cleanUp: (id) ->
-    delete @callbacks.changes[id]
-    delete @callbacks.adds[id]
-    delete @callbacks.removes[id]
+  cleanUp: (model) ->
+    modelName = getModelName(model)
+    id = model.get("id")
+    @channels.changes[modelName]?.then (chan) -> chan.off id
+    @channels.removes[modelName]?.then (chan) -> chan.off id
 
-  degenerateId: (store, key) ->
-    [type, id] = key.split("|+|")
-    store.peekRecord?(type, id) ? store.getById?(type, id)
+  subscribe: (chanType, modelName) ->
+    assertInclusion chanType, Ember.A(["changes", "adds", "removes"])
+    topic = Ember.String.pluralize modelName
+    chan = @socket.chan "#{topic}:#{chanType}"
+    @channels[chanType][modelName] = new RSVP.Promise (resolve) ->
+      chan.join().receive "ok", -> 
+        resolve chan
 
-  generateId: (record) ->
-    "#{record.constructor}|+|#{record.get 'id'}"
-
-  generateId2: (models, query) ->
-    "#{models.type}|+|#{JSON.stringify query}"
-
-  subscribe: (id) ->
-    @ddp.sub id
-    @subscriptions[id] = RSVP.deferred()
-
-  alreadySubscribed: (id) ->
-    @subscriptions[id]?.promise
-
-  resolveSubscription: (id) ->
-    @subscriptions[id]?.resolve id
+  getChan: (chanType, modelName) ->
+    @channels[chanType]?[modelName]
 
   listenForUpdatesTo: (record) ->
-    id = @generateId record
-    @subscribe id unless @alreadySubscribed(id)?
-    @callbacks.changes[id] ?= (fields) ->
-      store = record.store
-      store.pushPayload fields
-      record.reload()
+    modelName = getModelName(record)
+    if (chan = @getChan("changes", modelName))?
+      chan
+    else
+      @subscribe("changes", modelName)
+      .then (chan) ->
+        chan.on record.get("id"), (fields) ->
+          record.store.pushPayload fields
+          record #.reload()
+
   listenForAddRemoveTo: (models, query) ->
-    id = @generateId2 models, query
-    @subscribe id unless @alreadySubscribed(id)?
-    @callbacks.adds[id] ?= (fields) ->
-      store = models.store
-      store.pushPayload fields
-      models.update()
-    @callbacks.removes[id] ?= (id) =>
-      @cleanUp id
-      models.store.unloadRecord record if (record = @degenerateId(models.store, id))?
-      models.update()
-  handleNoSub: ({id, error}) ->
-    console.log error
-    alert error
-  handleReady: ({ids}) ->
-    ids.map @resolveSubscription.bind(@)
-  handleAdded: ({collection, id, fields}) -> 
-    @callbacks.adds[id]?(fields)
-  handleChanged: ({collection, id, fields, cleared}) -> 
-    @callbacks.changes[id]?(fields, cleared)
-  handleRemoved: ({collection, id}) ->
-    @callbacks.removes[id]?(id)
-  handleAddedBefore: ({collection, id, fields, before}) -> 
-  handleMovedBefore: ({collection, id, before}) -> 
-    
+    @listenForAddsTo(models, query)
+    @listenForRemovesTo(models, query)
+
+  listenForAddsTo: (models, query) ->
+    modelName = getModelName(models)
+    if (chan = @getChan("adds", modelName))?
+      chan
+    else
+      @subscribe("adds", modelName)
+      .then (chan) ->
+        chan.on "new", (fields) ->
+          # if matchesQuery query, fields
+          models.store.pushPayload fields
+          models # .update()
+
+  listenForRemovesTo: (models, query) ->
+    modelName = getModelName(models)
+    if (chan = @getChan("removes", modelName))?
+      chan
+    else
+      cs = @
+      @subscribe("removes", modelName)
+      .then (chan) ->
+        models.map (model) ->
+          chan.on model.get("id"), (fields) ->
+            cs.cleanUp model
+            models.store.unloadRecord model
+            models
+
 `export default ChannelStore`

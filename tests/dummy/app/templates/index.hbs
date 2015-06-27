@@ -1,0 +1,8 @@
+<ol>
+  {{#each model as |camera|}}
+    <li {{action "killCamera" camera}}>
+      <h2>{{camera.name}}-{{camera.id}}</h2>
+      <h4>{{camera.address}} -- {{camera.digits}}</h4>
+    </li>
+  {{/each}}
+</ol>

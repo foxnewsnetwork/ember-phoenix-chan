@@ -1,3 +1,20 @@
 <h2 id="title">Welcome to Ember.js</h2>
 
+<form {{action "makeCamera" on="submit"}}>
+  <legend>make camera</legend>
+  <label for="name">
+    name
+    {{input type="text" value=model.name name="name"}}
+  </label>
+  <label for="address">
+    address
+    {{input type="text" value=model.address name="address"}}
+  </label>
+  <label for="digits">
+    digits
+    {{input type="number" value=model.digits name="digits"}}
+  </label>
+  {{input type="submit" value="submit"}}
+</form>
+
 {{outlet}}
