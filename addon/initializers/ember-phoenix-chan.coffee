@@ -1,15 +1,7 @@
-`import DS from 'ember-data'`
-`import { push, findAll, query} from '../extensions/store'`
-
-initialize = ->
-  unless DS.Store::_emberPhoenixChanMonkeyPatch is true
-    DS.Store.reopen
-      _emberPhoenixChanMonkeyPatch: true
-      push: push
-      findAll: findAll
-      findByQuery: query
-      query: query
-
+initialize = (container, application) ->
+  application.inject "controller", "phoenix", "service:phoenix"
+  application.inject "route", "phoenix", "service:phoenix"
+  application.inject "adapter", "phoenix", "service:phoenix"
 
 EmberPhoenixChanInitializer =
   name: 'ember-phoenix-chan'

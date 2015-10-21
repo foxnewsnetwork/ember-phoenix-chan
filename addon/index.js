@@ -1,8 +1,4 @@
-import PhoenixChanMixin from './mixins/phoenix-chan';
-import ChannelStore from './models/channel-store';
-
-export default PhoenixChanMixin;
+import Phoenix from 'vendor/ember-phoenix-chan/phoenix';
 export {
-  PhoenixChanMixin,
-  ChannelStore
+  Phoenix
 };

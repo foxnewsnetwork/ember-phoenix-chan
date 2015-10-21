@@ -2,124 +2,52 @@
 
 Elixir has a great web framework called phoenix which ships with support for real-time communication (via sockets / long poll), and Ember, being a front-end framework, can benefit a lot from gaining real-time capabilities.
 
-This library attempts to achieve this through a compromise between what Phoenix ships and MeteorJS's DDP specs.
-
-> ## WARNING
->
-> This library is alpha software and a lot of DDP's functionalities will not have been implemented
->
-> Granted I'll be working on it (since I'll be using it), but you should only use it at your own descretion
->
-> Me
+This addon grabs phoenix.js from the phoenix framework and puts it into your ember app
 
 ## How to use
-Suppose you have a camera database and a camera model, you can setup real-time updates like so (you can also check out the example in the `serve` directory):
+For get started on building a Phoenix Elixir app, consult the good guide on phoenix here
 
-On the Elixir back-end, you'll need to setup your channel like so:
+http://www.phoenixframework.org/docs/channels
 
-`web/channels/camera_channel.ex`
-```elixir
-defmodule App.CameraChannel do
-  use App.Web, :channel
+In this addon, much of the same channel / socket functionality is exposed via the `phoenix` service
 
-  def join("cameras:adds", _auth_msg, socket) do
-    {:ok, socket}
-  end
-
-  def join("cameras:changes", _auth_msg, socket) do
-    {:ok, socket}
-  end
-
-  def join("cameras:removes", _auth_msg, socket) do
-    {:ok, socket}
-  end
-
-end
+phoenix automatically injected into controllers, routes, and the adapters
+```coffee
+SomeRoute = Ember.Route.extend
+  model: ->
+    @phoenix.connect("ws://localhost:4000/socket", {some_token: "x"})
+    .then =>
+      socket = @phoenix.get("socket")
+      channel = socket.channel("rooms:lobby", {})
+      channel.on "new:msg", (msg) -> # do something
+      channel.join()
 ```
-Be sure to also update your `web/router.ex`:
-```elixir
-...
-  socket "/ws", App do
-    channel "cameras:*", CameraChannel
-  end
-...
+Chris McCord has written a good example of how to use the js sockets exposed by phoenix.js:
+
+https://github.com/chrismccord/phoenix_chat_example/blob/master/web/static/js/app.js
+
+The source code for phoenix.js is here:
+
+https://github.com/phoenixframework/phoenix/blob/master/web/static/js/phoenix.js
+
+It's also possible to directly import Phoenix anywhere into your app:
+
+```js
+import {Phoenix, Socket, Channel} from 'vendor/ember-phoenix-chan/phoenix';
 ```
-You'll also need to tell your controller to broadcast changes as POST, PUT, and DELETE requests happen:
+## Testing and Development
+You'll need Elixir, Erlang, and the OTP on your local computer.
 
-`web/controllers/camera_controller.ex`
-```elixir
-defmodule App.CameraController do
-  ...
-  def create(conn, %{"camera" => camera_params}) do
-    ...
-    App.Endpoint.broadcast! "cameras:adds", "new", %{camera: camera}
-    ...
-  end
-
-  def update(conn, %{"id" => id, "camera" => camera_params}) do
-    ...
-    App.Endpoint.broadcast! "cameras:changes", "#{camera.id}", %{camera: camera}
-    ...
-  end
-
-  def delete(conn, %{"id" => id}) do
-    ...
-    App.Endpoint.broadcast! "cameras:removes", "#{camera.id}", %{camera: camera}
-    ...
-  end
-  ...
-end
-```
-Now, onto the front end! Mix `PhoenixChanMixin` into whatever adapter you wish and it should just work
-
-```javascript
-import PhoenixChanMixin from 'ember-phoenix-chan';
-
-ApplicationAdapter = DS.ActiveModelAdapter.extend(PhoenixChanMixin, {
-  socketNamespace: "ws", // you must provide these two, or else you'll see some nonsensical error lol
-  socketHost: "ws://localhost:4000" // you must provide these two, or else you'll see some nonsensical error lol
-});
-
-```
-Be sure to provide the `socketHost` and `socketNamespace` fields so Phoenix-chan knows where to look for your Elixir back-end
-
-## Q&A
-Q: WTF it's a mixin?! 
-
-A: Yes...
-
-Q: Why?!
-
-A: Because, if you're like me, you believe real-time is just an optimization over ctrl+r (or cmd+r if you're an insufferable bandwagoner), and therefore should be readily decoupled from the actual logic of your application.
-
-Are you running a rails / php backend and now, all of a sudden, you want to jump aboard the Elixir/Erlang craze and go real-time? Great, just setup your Phoenix back-end somewhere independent of your older back-end, and mix PhoenixChan into your already existing adapter (instead of writing a new one, or extending https://github.com/BlakeWilliams/ember-phoenix-adapter)!
-
-## Testing
-lol okay, I lied, there are no automated tests yet, but there is a local app in dummy that you can manually test. 
-
-But in order to do that, first, you'll need to install Erlang and Elixir. Unfortunately, this step is not trivial, but an excellent guide has been written up by Jose Valim and his cronies:
+You can get those things at the elixir website:
 
 http://elixir-lang.org/install.html
 
-Next, it helps (though it isn't required) if you install Phoenix, you can following the guide here:
-
-http://www.phoenixframework.org/v0.13.1/docs/installation
-
-Next, you'll need to build the example Phoenix app included in this addon (you'll also need MariaDB or Mysql):
-
-```shell
-cd serve
-mix deps.get
-mix ecto.create
-mix ecto.migrate
-iex -S mix phoenix.serve
-```
-
-Now, you're ready to boot up the dummy ember application:
+Once you have the tools for the backend, you can boot them up like so:
 
 ```shell
 cd ..
 npm install && bower install
+./bin/phoenix &
 ember s
 ```
 And navigate to localhost:4200 in your browser.

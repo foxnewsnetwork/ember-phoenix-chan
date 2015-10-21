@@ -1,8 +1,13 @@
-<ol>
-  {{#each model as |camera|}}
-    <li {{action "killCamera" camera}}>
-      <h2>{{camera.name}}-{{camera.id}}</h2>
-      <h4>{{camera.address}} -- {{camera.digits}}</h4>
-    </li>
+<form {{action "submit" on="submit"}}>
+  <textarea name="xx" class="form-control" rows="3"></textarea>
+  <button type="submit" class="btn btn-default">submit</button>
+</form>
+
+<div class="messages">
+  {{#each messages as |message|}}
+    <div class="message">
+      <span>{{message.user}}:&nbsp;</span>
+      <span>{{message.body}}</span>
+    </div>
   {{/each}}
-</ol>
+</div>

@@ -1,13 +1,16 @@
 `import Em from 'ember'`
 
+{alias} = Em.computed
+
 IndexController = Em.Controller.extend
-  cameras: Em.computed.alias("model")
-
+  channel: alias "model"
+  messages: alias "channel.messages"
   actions:
-    killCamera: (camera) ->
-      camera.destroyRecord()
-    makeCamera: (params) ->
-      @store.createRecord("camera", params)
-      .save()
-
+    submit: ->
+      body = Em.$("textarea[name=xx]").val()
+      user = "tester"
+      @get("channel")
+      .push "new:msg", {user, body}
+      .receive "ok", (msg) -> console.log msg
+      .receive "error", (msg) -> alert msg
 `export default IndexController`

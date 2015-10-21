@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd bower_components/ember-phoenix-chan/bower_components/phoenix_chat_example
+mix deps.get
+iex -S mix phoenix.server
