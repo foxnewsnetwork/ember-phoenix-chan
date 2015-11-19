@@ -47,7 +47,13 @@ Once you have the tools for the backend, you can boot them up like so:
 ```shell
 cd ..
 npm install && bower install
-./bin/phoenix &
+
+# Alternatively, use ./bin/phoenix
+cd bower_components/phoenix_chat_example
+mix local.hex
+mix deps.get
+iex -S mix phoenix.server
+
 ember s
 ```
 And navigate to localhost:4200 in your browser.
