@@ -7,7 +7,7 @@
 
 PhoenixService = Ember.Service.extend
   isConnected: equal "connectionState", "open"
-  p: computed get: -> new Promise (resolve) => resolve @
+  p: computed get: RSVP.resolve @
   
   init: ->
     @_super arguments...
@@ -27,14 +27,14 @@ PhoenixService = Ember.Service.extend
   connect: (endpoint, params={}) ->
     @disconnect()
     .then =>
-      socket = new Socket(endpoint)
+      socket = new Socket(endpoint, params)
       @set "socket", socket
       update = @updateStatus.bind(@)
       socket.onMessage update 
       socket.onClose update
       socket.onError update
       socket.onOpen update
-      socket.connect(params)
+      socket.connect()
       new Promise (resolve, reject) =>
         socket.onOpen => resolve @
         socket.onError => reject @
