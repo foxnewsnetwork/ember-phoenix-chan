@@ -9,7 +9,7 @@ This addon grabs phoenix.js from the Phoenix framework and puts it into your Emb
 Directly import where needed:
 
 ```js
-import Phoenix from 'ember-phoenix-chan/phoenix';
+import Phoenix from 'ember-phoenix-chan';
 {Socket, Channel, LongPoll, Ajax} = Phoenix
 ```
 To get started on building a Phoenix Elixir app, consult the good guide on Phoenix here:
