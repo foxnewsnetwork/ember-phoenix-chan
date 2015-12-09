@@ -6,22 +6,22 @@ This addon grabs phoenix.js from the Phoenix framework and puts it into your Emb
 
 ## How to use
 
+Directly import where needed:
+
+```js
+import Phoenix from 'ember-phoenix-chan/phoenix';
+{Socket, Channel, LongPoll, Ajax} = Phoenix
+```
 To get started on building a Phoenix Elixir app, consult the good guide on Phoenix here:
 
 [http://www.phoenixframework.org/docs/channels](http://www.phoenixframework.org/docs/channels)
 
-In this addon, much of the same channel / socket functionality is exposed via the `phoenix` service
-
-phoenix is automatically injected into controllers, routes, and the adapters
+As a convenience, Socket, Channel, LongPoll, and Ajax are all also available as a phoenix service
 ```coffee
 SomeRoute = Ember.Route.extend
   model: ->
-    @phoenix.connect("ws://localhost:4000/socket", {some_token: "x"})
-    .then =>
-      socket = @phoenix.get("socket")
-      channel = socket.channel("rooms:lobby", {})
-      channel.on "new:msg", (msg) -> # do something
-      channel.join()
+    {Socket} = @phoenix
+    new Socket()
 ```
 Chris McCord has written a good example of how to use the js sockets exposed by phoenix.js:
 
@@ -31,11 +31,6 @@ The source code for phoenix.js is here:
 
 [https://github.com/phoenixframework/phoenix/blob/master/web/static/js/phoenix.js](https://github.com/phoenixframework/phoenix/blob/master/web/static/js/phoenix.js)
 
-It's also possible to directly import Phoenix anywhere into your app:
-
-```js
-import {Phoenix, Socket, Channel} from 'vendor/ember-phoenix-chan/phoenix';
-```
 ## Testing and Development
 
 You'll need Elixir, Erlang, and the OTP on your local computer.

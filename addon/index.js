@@ -1,4 +1,2 @@
-import Phoenix from 'vendor/ember-phoenix-chan/phoenix';
-export {
-  Phoenix
-};
+import Phoenix from 'ember-phoenix-chan/phoenix';
+export default Phoenix;
