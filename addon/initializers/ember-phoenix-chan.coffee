@@ -1,4 +1,4 @@
-initialize = (container, application) ->
+initialize = (application) ->
   application.inject "controller", "phoenix", "service:phoenix"
   application.inject "route", "phoenix", "service:phoenix"
   application.inject "adapter", "phoenix", "service:phoenix"
