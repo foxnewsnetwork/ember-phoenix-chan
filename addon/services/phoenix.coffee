@@ -1,7 +1,7 @@
 `import Ember from 'ember'`
 `import Phoenix from 'ember-phoenix-chan/phoenix'`
 
-{Channel, Socket, LongPoll, Ajax} = Phoenix
+{Channel, Socket, LongPoll, Ajax, Presence} = Phoenix
 {computed, isBlank, RSVP} = Ember
 {equal} = computed
 {Promise} = RSVP
@@ -12,6 +12,7 @@ PhoenixService = Ember.Service.extend
   Socket: Socket
   LongPoll: LongPoll
   Ajax: Ajax
+  Presence: Presence
   isConnected: equal "connectionState", "open"
   p: computed get: RSVP.resolve @
   

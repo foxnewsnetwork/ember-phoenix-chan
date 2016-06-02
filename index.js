@@ -20,7 +20,7 @@ module.exports = {
     var phoenix = path.join('ember-phoenix-chan', 'phoenix.js');
     // app.import(phoenix);  
     app.import(phoenix, {
-      exports: ["Channel", "Socket", "LongPoll", "Ajax"]
+      exports: ["Channel", "Socket", "LongPoll", "Ajax", "Presence"]
     });
   },
   mergePhoenix: function mergePhoenix(tree) {

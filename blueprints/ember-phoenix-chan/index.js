@@ -4,6 +4,6 @@ module.exports = {
   normalizeEntityName: function() {},
 
   afterInstall: function() {
-    return this.addBowerPackageToProject('phoenix', 'phoenixframework/phoenix#v1.1.4');
+    return this.addBowerPackageToProject('phoenix', 'phoenixframework/phoenix#v1.2.0-rc.1');
   }
 }

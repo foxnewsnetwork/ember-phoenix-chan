@@ -10,19 +10,12 @@ Directly import where needed:
 
 ```js
 import Phoenix from 'ember-phoenix-chan';
-{Socket, Channel, LongPoll, Ajax} = Phoenix
+const {Socket, Channel, LongPoll, Ajax, Presence} = Phoenix;
 ```
 To get started on building a Phoenix Elixir app, consult the good guide on Phoenix here:
 
 [http://www.phoenixframework.org/docs/channels](http://www.phoenixframework.org/docs/channels)
 
-As a convenience, Socket, Channel, LongPoll, and Ajax are all also available as a phoenix service
-```coffee
-SomeRoute = Ember.Route.extend
-  model: ->
-    {Socket} = @phoenix
-    new Socket()
-```
 Chris McCord has written a good example of how to use the js sockets exposed by phoenix.js:
 
 [https://github.com/chrismccord/phoenix_chat_example/blob/master/web/static/js/app.js](https://github.com/chrismccord/phoenix_chat_example/blob/master/web/static/js/app.js)
@@ -30,6 +23,10 @@ Chris McCord has written a good example of how to use the js sockets exposed by 
 The source code for phoenix.js is here:
 
 [https://github.com/phoenixframework/phoenix/blob/master/web/static/js/phoenix.js](https://github.com/phoenixframework/phoenix/blob/master/web/static/js/phoenix.js)
+
+Starting in Phoenix 1.2, you now have access to this thing called "Presence" which is some CRDT-based distributed state synchronization tool built natively into Phoenix. Read about it here:
+
+[https://hexdocs.pm/phoenix/1.2.0-rc.1/Phoenix.Presence.html#summary](https://hexdocs.pm/phoenix/1.2.0-rc.1/Phoenix.Presence.html#summary)
 
 ## Testing and Development
 
